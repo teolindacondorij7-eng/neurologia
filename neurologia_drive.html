@@ -784,12 +784,23 @@ async function finalSave(){
 }
 
 function sendToScript(url, payload) {
-  // Enviar via GET con datos en URL - método más confiable con Apps Script
-  const encoded = btoa(unescape(encodeURIComponent(payload)));
-  return fetch(url + '?data=' + encoded, {
-    method: 'GET',
-    mode: 'no-cors'
-  }).catch(e => console.error('Error:', e));
+  return new Promise((resolve) => {
+    const encoded = btoa(unescape(encodeURIComponent(payload)));
+    const fullUrl = url + '?data=' + encoded;
+    console.log('Enviando via XHR a:', fullUrl.substring(0, 80));
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', fullUrl, true);
+    xhr.onload = function() {
+      console.log('XHR respuesta:', xhr.responseText);
+      resolve();
+    };
+    xhr.onerror = function() {
+      console.log('XHR error - puede ser CORS pero datos enviados');
+      resolve();
+    };
+    xhr.send();
+    setTimeout(resolve, 6000);
+  });
 }
 
 function showSaving(msg){
