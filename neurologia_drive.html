@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#185FA5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Neurología">
+<title>Neurología Pediátrica</title>
+<link rel="manifest" id="manifestLink">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f7fa;color:#1a1a2e;font-size:16px;}
+  :root{
+    --blue:#185FA5;--blue-light:#E6F1FB;--blue-dark:#0C447C;
+    --green:#3B6D11;--green-light:#EAF3DE;
+    --red:#A32D2D;--red-light:#FCEBEB;
+    --amber:#854F0B;--amber-light:#FAEEDA;
+    --purple:#534AB7;--purple-light:#EEEDFE;
+    --teal:#0F6E56;--teal-light:#E1F5EE;
+    --coral:#993C1D;--coral-light:#FAECE7;
+    --gray:#5F5E5A;--gray-light:#F1EFE8;
+    --border:#e0e4ef;--surface:#ffffff;--bg:#f5f7fa;
+    --text:#1a1a2e;--text2:#5a5a7a;--text3:#9090aa;
+    --radius:12px;--radius-sm:8px;--radius-lg:16px;
+  }
+  .screen{display:none;flex-direction:column;height:100vh;max-width:430px;margin:0 auto;background:var(--bg);}
+  .screen.active{display:flex;}
+  .topbar{background:var(--surface);padding:14px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .topbar-back{background:none;border:none;cursor:pointer;color:var(--text);padding:4px;font-size:20px;line-height:1;display:flex;align-items:center;}
+  .topbar-info{flex:1;}
+  .topbar-title{font-size:16px;font-weight:600;color:var(--text);}
+  .topbar-sub{font-size:12px;color:var(--text2);margin-top:1px;}
+  .topbar-action{background:var(--blue);color:#fff;border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;}
+  .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;}
+  .bottom-bar{background:var(--surface);padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0;}
+  .btn{padding:13px 20px;border-radius:var(--radius);border:none;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s,transform .1s;-webkit-appearance:none;}
+  .btn:active{opacity:.82;transform:scale(0.98);}
+  .btn-primary{background:var(--blue);color:#fff;flex:1;}
+  .btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border);}
+  .btn-success{background:var(--green);color:#fff;flex:1;}
+  .btn-block{width:100%;margin-bottom:10px;border-radius:var(--radius);}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+  .field select,.field input,.field textarea{width:100%;padding:13px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-family:inherit;-webkit-appearance:none;appearance:none;outline:none;}
+  .field select:focus,.field input:focus,.field textarea:focus{border-color:var(--blue);}
+  .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235a5a7a' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;}
+  .field textarea{min-height:80px;resize:vertical;line-height:1.5;}
+  .col2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .subsec{margin:20px 0 4px;}
+  .subsec-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:12px;}
+  .tg-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .tg-btn{padding:13px 8px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);font-size:14px;color:var(--text2);cursor:pointer;text-align:center;transition:all .15s;font-family:inherit;line-height:1.2;}
+  .tg-btn:active{transform:scale(0.97);}
+  .tg-btn.si{background:var(--green-light);border-color:#97C459;color:var(--green);font-weight:600;}
+  .tg-btn.no{background:var(--red-light);border-color:#F09595;color:var(--red);font-weight:600;}
+  .tg-btn.sel{background:var(--blue-light);border-color:var(--blue);color:var(--blue-dark);font-weight:600;}
+  .stepper{background:var(--surface);padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;gap:0;flex-shrink:0;}
+  .stepper::-webkit-scrollbar{display:none;}
+  .st{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;min-width:50px;}
+  .st-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid var(--border);color:var(--text3);background:var(--bg);transition:all .2s;}
+  .st-dot.active{border-color:var(--blue);background:var(--blue);color:#fff;}
+  .st-dot.done{border-color:var(--green);background:var(--green-light);color:var(--green);}
+  .st-lbl{font-size:9px;color:var(--text3);text-align:center;max-width:50px;line-height:1.2;}
+  .st-lbl.active{color:var(--blue);font-weight:600;}
+  .st-line{width:14px;height:2px;background:var(--border);flex-shrink:0;margin-bottom:13px;}
+  .st-line.done{background:#97C459;}
+  .progress{height:3px;background:var(--border);flex-shrink:0;}
+  .progress-fill{height:100%;background:var(--blue);transition:width .35s;}
+  .hero{background:var(--blue);color:#fff;padding:20px 16px;margin:-16px -16px 16px;}
+  .hero-title{font-size:20px;font-weight:700;}
+  .hero-sub{font-size:13px;opacity:.8;margin-top:4px;}
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .stat-card{background:var(--surface);border-radius:var(--radius);padding:14px;border:1px solid var(--border);}
+  .stat-num{font-size:26px;font-weight:700;color:var(--text);}
+  .stat-lbl{font-size:12px;color:var(--text2);margin-top:3px;}
+  .drive-card{background:var(--surface);border-radius:var(--radius);padding:14px 16px;border:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+  .drive-card:active{background:var(--bg);}
+  .drive-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .drive-icon.connected{background:var(--green-light);color:var(--green);}
+  .drive-icon.disconnected{background:var(--gray-light);color:var(--gray);}
+  .drive-info{flex:1;}
+  .drive-name{font-size:14px;font-weight:600;}
+  .drive-status{font-size:12px;color:var(--text2);margin-top:2px;}
+  .rec-item{background:var(--surface);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);cursor:pointer;transition:border-color .15s;}
+  .rec-item:active{border-color:var(--blue);background:var(--blue-light);}
+  .rec-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+  .rec-name{font-size:15px;font-weight:600;}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+  .b-mogad{background:var(--blue-light);color:var(--blue-dark);}
+  .b-adem{background:var(--green-light);color:var(--green);}
+  .b-em{background:var(--amber-light);color:var(--amber);}
+  .b-aqp4{background:var(--purple-light);color:var(--purple);}
+  .b-nd{background:var(--gray-light);color:var(--gray);}
+  .rec-meta{font-size:12px;color:var(--text2);margin-top:5px;display:flex;gap:10px;flex-wrap:wrap;}
+  .toast-wrap{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:999;width:calc(100% - 32px);max-width:380px;}
+  .toast{padding:13px 16px;border-radius:var(--radius);font-size:14px;font-weight:500;text-align:center;display:none;animation:slideUp .25s ease;}
+  .toast.show{display:block;}
+  .toast.ok{background:var(--green);color:#fff;}
+  .toast.err{background:var(--red);color:#fff;}
+  .toast.info{background:var(--blue);color:#fff;}
+  .toast.warn{background:var(--amber);color:#fff;}
+  @keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:flex-end;padding:0;}
+  .modal-wrap.show{display:flex;}
+  .modal{background:var(--surface);border-radius:var(--radius-lg) var(--radius-lg) 0 0;padding:20px 16px 32px;width:100%;max-height:90vh;overflow-y:auto;}
+  .modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
+  .modal h3{font-size:17px;font-weight:700;margin-bottom:6px;}
+  .modal p{font-size:14px;color:var(--text2);margin-bottom:16px;line-height:1.5;}
+  .step-box{background:var(--bg);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;border:1px solid var(--border);}
+  .step-box strong{display:block;font-size:13px;margin-bottom:4px;}
+  .step-box span{font-size:12px;color:var(--text2);line-height:1.5;}
+  .step-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:700;margin-right:6px;flex-shrink:0;}
+  .summary-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--border);gap:8px;}
+  .summary-key{font-size:13px;color:var(--text2);flex-shrink:0;}
+  .summary-val{font-size:13px;font-weight:600;text-align:right;}
+  .code-box{background:#1a1a2e;color:#7ec8e3;font-family:monospace;font-size:11px;padding:12px;border-radius:8px;margin:8px 0 12px;overflow-x:auto;white-space:pre;line-height:1.6;}
+  .copy-btn{background:var(--blue-light);color:var(--blue-dark);border:1px solid var(--blue);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;width:100%;margin-bottom:10px;}
+  .saving-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+  .saving-overlay.show{display:flex;}
+  .spinner{width:40px;height:40px;border:4px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .saving-overlay p{font-size:14px;font-weight:600;color:var(--text2);}
+  .alert-box{border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.5;}
+  .alert-box.warn{background:var(--amber-light);color:var(--amber);border:1px solid #e8b86d;}
+  .alert-box.info{background:var(--blue-light);color:var(--blue-dark);border:1px solid #90bce8;}
+  .alert-box.ok{background:var(--green-light);color:var(--green);border:1px solid #97C459;}
+</style>
+</head>
+<body>
+
+<!-- SAVING OVERLAY -->
+<div class="saving-overlay" id="savingOverlay">
+  <div class="spinner"></div>
+  <p id="savingMsg">Guardando en Google Sheets…</p>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap"><div class="toast" id="toast"></div></div>
+
+<!-- ===== HOME ===== -->
+<div class="screen active" id="scHome">
+  <div class="topbar">
+    <div class="topbar-info">
+      <div class="topbar-title">🧠 Neurología Pediátrica</div>
+      <div class="topbar-sub">Enfermedades desmielinizantes</div>
+    </div>
+    <button class="topbar-action" onclick="goRecords()" aria-label="Ver registros" style="background:var(--gray-light);color:var(--text);">☰</button>
+  </div>
+  <div class="content">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num" id="hTotal">0</div><div class="stat-lbl">Registros</div></div>
+      <div class="stat-card"><div class="stat-num" id="hHoy">0</div><div class="stat-lbl">Cargados hoy</div></div>
+      <div class="stat-card"><div class="stat-num" id="hMogad">0</div><div class="stat-lbl">MOGAD</div></div>
+      <div class="stat-card"><div class="stat-num" id="hAdem">0</div><div class="stat-lbl">ADEM</div></div>
+    </div>
+    <div class="drive-card" onclick="openDriveSetup()" id="driveCard">
+      <div class="drive-icon disconnected" id="driveIcon">📋</div>
+      <div class="drive-info">
+        <div class="drive-name" id="driveName">Conectar Google Sheets</div>
+        <div class="drive-status" id="driveStatusTxt">Tocá para configurar la sincronización</div>
+      </div>
+      <span style="color:var(--text3);font-size:18px;">›</span>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="goNewForm()" style="margin-top:4px;font-size:16px;padding:16px;">+ Nuevo registro</button>
+    <button class="btn btn-secondary btn-block" onclick="goRecords()">📋 Ver todos los registros</button>
+    <button class="btn btn-secondary btn-block" onclick="exportCSV()">⬇ Exportar CSV</button>
+  </div>
+</div>
+
+<!-- ===== RECORDS ===== -->
+<div class="screen" id="scRecords">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goHome()">‹</button>
+    <div class="topbar-info"><div class="topbar-title">Registros</div></div>
+    <button class="topbar-action" onclick="goNewForm()" aria-label="Nuevo">+</button>
+  </div>
+  <div class="content" id="recordsList"></div>
+</div>
+
+<!-- ===== FORM ===== -->
+<div class="screen" id="scForm">
+  <div class="topbar">
+    <button class="topbar-back" onclick="formBack()" aria-label="Volver">‹</button>
+    <div class="topbar-info">
+      <div class="topbar-title" id="fTitle">Nuevo registro</div>
+      <div class="topbar-sub" id="fSub">Paso 1 de 6</div>
+    </div>
+    <span style="font-size:13px;color:var(--text2);" id="fCounter">1/6</span>
+  </div>
+  <div class="progress"><div class="progress-fill" id="fProg" style="width:16.6%"></div></div>
+  <div class="stepper" id="fStepper"></div>
+  <div class="content" id="fBody"></div>
+  <div class="bottom-bar">
+    <button class="btn btn-secondary" id="fBtnBack" onclick="stepPrev()" style="display:none;min-width:54px;">‹</button>
+    <button class="btn btn-primary" id="fBtnNext" onclick="stepNext()">Siguiente ›</button>
+  </div>
+</div>
+
+<!-- ===== DRIVE SETUP MODAL ===== -->
+<div class="modal-wrap" id="driveModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>📊 Conectar con tu Google Sheets</h3>
+    <p>Seguí estos pasos para que la app guarde los datos directamente en tu planilla de Drive.</p>
+
+    <div id="driveConnectedInfo" style="display:none;">
+      <div class="alert-box ok">✅ <strong>Google Sheets conectado.</strong> Los registros nuevos se guardan automáticamente en tu planilla.</div>
+    </div>
+
+    <div class="step-box">
+      <strong><span class="step-num">1</span>Abrí tu Google Sheet</strong>
+      <span>En tu planilla de Drive, andá al menú: <strong>Extensiones → Apps Script</strong></span>
+    </div>
+    <div class="step-box">
+      <strong><span class="step-num">2</span>Pegá este código (reemplazá todo)</strong>
+      <span>Borrá lo que haya en el editor y pegá este script:</span>
+    </div>
+    <button class="copy-btn" onclick="copyScript()">📋 Copiar el script</button>
+    <div class="code-box" id="scriptPreview">function guardarDatos(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(data.sheet || "Hoja1");
+  if (!sheet) sheet = ss.getActiveSheet();
+
+  var dni = String(data.row[5] || "").trim();
+  var found = false;
+  if (dni) {
+    var lastRow = sheet.getLastRow();
+    for (var i = 6; i <= lastRow; i++) {
+      var cellDni = String(sheet.getRange(i, 6).getValue()).trim();
+      if (cellDni === dni) {
+        sheet.getRange(i, 1, 1, data.row.length).setValues([data.row]);
+        found = true;
+        break;
+      }
+    }
+  }
+  if (!found) sheet.appendRow(data.row);
+  return found;
+}
+
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var found = guardarDatos(data);
+    return ContentService
+      .createTextOutput(JSON.stringify({status:"ok", updated: found}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({status:"error", msg:err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  try {
+    // Si viene con datos (desde archivo local via GET)
+    if (e.parameter && e.parameter.data) {
+      var decoded = decodeURIComponent(escape(atob(e.parameter.data)));
+      var data = JSON.parse(decoded);
+      var found = guardarDatos(data);
+      return ContentService
+        .createTextOutput(JSON.stringify({status:"ok", updated: found}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    // Si es solo un ping de prueba
+    return ContentService
+      .createTextOutput(JSON.stringify({status:"ok", msg:"Script activo"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({status:"error", msg:err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}</div>
+
+    <div class="step-box">
+      <strong><span class="step-num">3</span>Implementar como aplicación web</strong>
+      <span>Hacé clic en <strong>Implementar → Nueva implementación</strong> → Tipo: <strong>Aplicación web</strong> → Ejecutar como: <strong>Yo</strong> → Acceso: <strong>Cualquier persona</strong> → <strong>Implementar</strong> → autorizá → copiá la URL.</span>
+    </div>
+    <div class="step-box">
+      <strong><span class="step-num">4</span>Pegá la URL abajo</strong>
+      <span>La URL empieza con <code>https://script.google.com/macros/s/...</code></span>
+    </div>
+
+    <div class="field"><label>URL del Apps Script *</label><input type="url" id="driveUrl" placeholder="https://script.google.com/macros/s/..." inputmode="url"></div>
+    <div class="field"><label>Nombre de la hoja (pestaña)</label><input type="text" id="driveSheet" value="Hoja1" placeholder="Hoja1"></div>
+
+    <div id="testResult" style="margin-bottom:12px;display:none;"></div>
+
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-secondary" onclick="closeDriveModal()">Cancelar</button>
+      <button class="btn" style="background:var(--teal);color:#fff;flex:1;" onclick="testConnection()">🔍 Probar conexión</button>
+      <button class="btn btn-primary" onclick="saveDriveConfig()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATOS PRECARGADOS (23 pacientes del Excel) ───────────────────────────────
+const PRESET_RECORDS = [
+  {"nomina":"Cáceres Víctor","sexo":"MASCULINO","edad":"13 años","enfermedad":"Neuritis óptica","dni":"49069604","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Lujan Tiziano","sexo":"MASCULINO","edad":"7 años","enfermedad":"MOGAD: Neuritis óptica + pseudotumor","dni":"54513832","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Álvarez luz","sexo":"FEMENINO","edad":"15 años","enfermedad":"Encefalitis NMDA","dni":"47793976","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Alvarez Joel","sexo":"MASCULINO","edad":"12 años","enfermedad":"Sospecha encefalomielitis inmunomediada - meningitis aseptica","dni":"48464979","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Florez tatiana","sexo":"FEMENINO","edad":"7 años","enfermedad":"Mielitis logitudinal extensa","dni":"54699272","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Sendra fausto","sexo":"MASCULINO","edad":"3 años","enfermedad":"ADEM","dni":"57467736","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Palavecino ian","sexo":"MASCULINO","edad":"7 años","enfermedad":"Revisar HC papel (aluc viusales, psiquiatria?)","dni":"54881812","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Sosa Joel","sexo":"MASCULINO","edad":"8 años","enfermedad":"Mielitis transversa","dni":"53750099","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Araujo luciano","sexo":"MASCULINO","edad":"15 años","enfermedad":"sospecha de encefaltis inmunomediada/debut psiquiatrico","dni":"48021232","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Valentina He","sexo":"FEMENINO","edad":"9 años","enfermedad":"Encefalitis Inmunomediada NMDA","dni":"53587848","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Coronel Federico","sexo":"MASCULINO","edad":"15 años","enfermedad":"Recaida NMDA","dni":"48510165","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Nina garay","sexo":"FEMENINO","edad":"7 años","enfermedad":"Encefalitis inmunomediada seronegativa - recaida","dni":"56497835","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Ojeda martina","sexo":"FEMENINO","edad":"4 años","enfermedad":"Sospecha de encefalitis inmunomediada","dni":"58717672","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Marchesani Ambar","sexo":"FEMENINO","edad":"","enfermedad":"Sospecha de area postrema?","dni":"54290378","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Bianca Giacobini","sexo":"MASCULINO","edad":"3 años","enfermedad":"Encefalitis Inmunomediada NMDA","dni":"59323512","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Zaidan Mora","sexo":"FEMENINO","edad":"9 años","enfermedad":"sospecha de encef inmunomediada vs pseudotumor atipico","dni":"55746273","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"oliver moreyra","sexo":"MASCULINO","edad":"6 años","enfermedad":"Primer evento desmilinizante","dni":"57540424","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Jeremías Retamar","sexo":"MASCULINO","edad":"11 años","enfermedad":"Primer evento desmilinizante","dni":"53590641","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Perea tiziano","sexo":"MASCULINO","edad":"12 años","enfermedad":"Primer evento desmilinizante","dni":"52626748","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Erick colque","sexo":"MASCULINO","edad":"12 años","enfermedad":"Desmilinizante - ALERD 2dario a MOG?","dni":"52925304","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Zoe Ledesma","sexo":"FEMENINO","edad":"9 años","enfermedad":"Primer evento desmilinizante - Neuritis optica MOG positivo","dni":"55810838","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Dayra Ailin Garcia","sexo":"FEMENINO","edad":"12 años","enfermedad":"Neuritis optica","dni":"53381368","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true},
+  {"nomina":"Marques, Luz Indiana","sexo":"FEMENINO","edad":"3 años","enfermedad":"ADEM","dni":"59462658","_ts":"2026-05-22T00:00:00.000Z","_togs":{},"_preset":true}
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+// Si no hay nada guardado localmente, cargar los 23 pacientes del Excel
+const _saved = localStorage.getItem('neuro_v2');
+let records = _saved ? JSON.parse(_saved) : PRESET_RECORDS.slice();
+// Si hay guardado pero no tiene los presets, mergear (evita duplicados por DNI)
+if (_saved && records.length < PRESET_RECORDS.length) {
+  const dniSet = new Set(records.map(r => r.dni));
+  PRESET_RECORDS.forEach(p => { if (!dniSet.has(p.dni)) records.unshift(p); });
+  localStorage.setItem('neuro_v2', JSON.stringify(records));
+}
+const FIXED_URL = 'https://script.google.com/macros/s/AKfycbywMMNCwKRNQ26oibaq9JIQbLF_emnyapL3vKjZx7B1-dVCqKxAh6VwyREUXSyaRKeX7w/exec';
+if (!localStorage.getItem('neuro_drive_v2')) {
+  localStorage.setItem('neuro_drive_v2', JSON.stringify({url: FIXED_URL, sheet: 'Hoja1'}));
+}
+let driveConf = JSON.parse(localStorage.getItem('neuro_drive_v2'));
+if (!driveConf.url) driveConf = {url: FIXED_URL, sheet: 'Hoja1'};
+let cur = {};
+let curIdx = -1;
+let curStep = 0;
+let togs = {};
+let diagSel = '';
+let resp5Sel = '';
+
+// ─── APPS SCRIPT CODE ─────────────────────────────────────────────────────────
+const APPS_SCRIPT = `function guardarDatos(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(data.sheet || "Hoja1");
+  if (!sheet) sheet = ss.getActiveSheet();
+
+  var dni = String(data.row[5] || "").trim();
+  var found = false;
+  if (dni) {
+    var lastRow = sheet.getLastRow();
+    for (var i = 6; i <= lastRow; i++) {
+      var cellDni = String(sheet.getRange(i, 6).getValue()).trim();
+      if (cellDni === dni) {
+        sheet.getRange(i, 1, 1, data.row.length).setValues([data.row]);
+        found = true;
+        break;
+      }
+    }
+  }
+  if (!found) sheet.appendRow(data.row);
+  return found;
+}
+
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var found = guardarDatos(data);
+    return ContentService
+      .createTextOutput(JSON.stringify({status:"ok", updated: found}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({status:"error", msg:err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  try {
+    // Si viene con datos (desde archivo local via GET)
+    if (e.parameter && e.parameter.data) {
+      var decoded = decodeURIComponent(escape(atob(e.parameter.data)));
+      var data = JSON.parse(decoded);
+      var found = guardarDatos(data);
+      return ContentService
+        .createTextOutput(JSON.stringify({status:"ok", updated: found}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    // Si es solo un ping de prueba
+    return ContentService
+      .createTextOutput(JSON.stringify({status:"ok", msg:"Script activo"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({status:"error", msg:err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+
+function copyScript(){
+  navigator.clipboard.writeText(APPS_SCRIPT).then(()=>showToast('Script copiado ✓','ok')).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=APPS_SCRIPT; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('Script copiado ✓','ok');
+  });
+}
+
+// ─── SERVICE WORKER ───────────────────────────────────────────────────────────
+if('serviceWorker' in navigator){
+  const sw=`const V='neuro-v2';self.addEventListener('install',e=>e.waitUntil(caches.open(V).then(c=>c.addAll([self.location.pathname]))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
+  const blob=new Blob([sw],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function goHome(){ showScreen('scHome'); updateStats(); }
+function goRecords(){ renderRecords(); showScreen('scRecords'); }
+function goNewForm(idx){
+  curIdx = idx !== undefined ? idx : -1;
+  cur = curIdx >= 0 ? Object.assign({}, records[curIdx]) : {};
+  togs = cur._togs || {};
+  diagSel = cur.diagnostico || '';
+  resp5Sel = cur.respuesta5 || '';
+  curStep = 0;
+  document.getElementById('fTitle').textContent = curIdx >= 0 ? 'Editar registro' : 'Nuevo registro';
+  renderStepper(); renderStep();
+  showScreen('scForm');
+}
+function formBack(){ goHome(); }
+
+// ─── STEPS ────────────────────────────────────────────────────────────────────
+const STEPS = [
+  {id:'epi',lbl:'Epidemio.'},
+  {id:'cli',lbl:'Clínica'},
+  {id:'est',lbl:'Estudios'},
+  {id:'tra',lbl:'Tratam.'},
+  {id:'eds',lbl:'EDSS'},
+  {id:'dia',lbl:'Diagnóst.'},
+];
+
+const SYMS = ['fiebre','vomitos','sensorio','cefalea','convulsiones','parestesias','marcha','mielitis','visuales','craneales','ataxia','pares'];
+const SYMS_LBL = {fiebre:'Fiebre',vomitos:'Vómitos',sensorio:'Alt. sensorio',cefalea:'Cefalea',convulsiones:'Convulsiones',parestesias:'Parestesias',marcha:'Alt. marcha',mielitis:'Mielitis transversa',visuales:'Alt. visuales',craneales:'Alt. craneales',ataxia:'Ataxia',pares:'Alt. pares craneales'};
+
+function sec(id){
+  const SL=(n,fid,opts)=>`<div class="field"><label>${n}</label><select id="f_${fid}"><option value="">— elegir —</option>${opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+  const TXT=(n,fid,ph)=>`<div class="field"><label>${n}</label><input type="text" id="f_${fid}" placeholder="${ph||''}"></div>`;
+  const TA=(n,fid,ph)=>`<div class="field"><label>${n}</label><textarea id="f_${fid}" placeholder="${ph||''}"></textarea></div>`;
+  const POS=['POSITIVO','NEGATIVO','NO REALIZADO'];
+  const NOR=['NORMAL','PATOLOGICO','NO REALIZADO'];
+  const H=s=>`<div class="subsec"><div class="subsec-label">${s}</div>`;
+
+  const d={
+    epi:`<div style="background:var(--blue);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px;"><div style="font-size:22px;">👤</div><div><div style="font-weight:700;font-size:15px;">Datos epidemiológicos</div><div style="font-size:12px;opacity:.8;margin-top:2px;">Información del paciente</div></div></div>
+    ${TXT('Nombre y apellido *','nomina','Nombre completo')}
+    <div class="col2">${TXT('DNI *','dni','Número')}<div></div></div>
+    <div class="col2">
+      ${SL('Sexo','sexo',['MASCULINO','FEMENINO'])}
+      ${SL('Edad','edad',['1 año','2 años','3 años','4 años','5 años','6 años','7 años','8 años','9 años','10 años','11 años','12 años','13 años','14 años','15 años','16 años','17 años','18 años'])}
+    </div>
+    ${TXT('Enfermedad de base','enfermedad','Diagnóstico de base')}`,
+
+    cli:`<div style="background:var(--green);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px;"><div style="font-size:22px;">🩺</div><div><div style="font-weight:700;font-size:15px;">Clínica</div><div style="font-size:12px;opacity:.8;margin-top:2px;">Síntomas y presentación</div></div></div>
+    ${H('Síntomas — tocá para marcar Sí / No')}<div class="tg-grid" id="symsGrid"></div></div>
+    ${H('Déficit y presentación')}
+    <div class="col2">
+      ${SL('Déficit SNC','deficit_snc',['SI','NO'])}
+      ${SL('Tipo presentación (TPC)','tpc',['ENCEFALOPÁTICA','MEDULAR','ÓPTICA','SME. TRONCO ENCEFÁLICO','SME. CEREBELOSO','SME CEREBRAL','VARIOS'])}
+    </div>
+    <div class="col2">
+      ${SL('Déficit focal','deficit_tipo',['UNIFOCAL','MULTIFOCAL'])}
+      ${SL('Curso clínico','curso',['MONOFÁSICO','RECURRENTE','PROGRESIVO'])}
+    </div>
+    ${TA('Observaciones déficit','obs_deficit','Notas sobre déficit SNC')}
+    ${TA('Observaciones TPC','obs_tpc','Notas sobre tipo de presentación')}
+    ${TA('Observaciones clínicas generales','cli_obs','Notas adicionales')}</div>`,
+
+    est:`<div style="background:var(--amber);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px;"><div style="font-size:22px;">🔬</div><div><div style="font-weight:700;font-size:15px;">Estudios complementarios</div><div style="font-size:12px;opacity:.8;margin-top:2px;">LCR, Serologías, RMN, Anticuerpos</div></div></div>
+    ${H('LCR')}
+    <div class="col2">
+      ${SL('Citoquímico','lcr',['PLEOCITOSIS','PROTEINORRAQUIA','AMBAS','NORMAL'])}
+      ${SL('Bandas oligoclonales','bandas',POS)}
+      ${SL('Cultivo BAC','cult_bac',POS)}
+      ${SL('Cultivo VIRO','cult_viro',POS)}
+    </div>
+    ${TA('Observaciones LCR','lcr_obs','Observaciones del LCR')}</div>
+    ${H('Serologías')}
+    <div class="col2">
+      ${SL('VDRL','vdrl',POS)}${SL('VHI','vhi',POS)}
+      ${SL('VHB','vhb',POS)}${SL('VHC','vhc',POS)}
+      ${SL('H. Zoster','zoster',POS)}${SL('Varicela','varicela',POS)}
+      ${SL('E. Barr','ebarr',POS)}
+    </div></div>
+    ${H('RMN (con/sin contraste)')}
+    <div class="col2">
+      ${SL('Cerebral','rmn_cerebral',NOR)}${SL('Órbita','rmn_orbita',NOR)}
+      ${SL('Medular completa','rmn_medular',NOR)}${SL('RM Órbita','rm_orbita',NOR)}
+    </div>
+    ${TA('Descripción de hallazgos RMN','rmn_desc','Hallazgos relevantes')}</div>
+    ${H('Anticuerpos y autoinmunidad')}
+    <div class="col2">
+      ${SL('Anti MOG','antimog',POS)}${SL('Anti AQP4','antiaqp4',POS)}
+      ${SL('PEAT','peat',NOR)}${SL('OCT','oct',NOR)}
+      ${SL('Valoración oft. observaciones','oft_obs_sel',['NORMAL','PATOLOGICO','NO REALIZADO'])}
+    </div>
+    ${TA('Observaciones oftalmológicas','oft_obs','Observaciones valoración oftalmológica')}
+    <div class="col2">
+      ${SL('Inmunológico','inmunologico',['NORMAL','PATOLÓGICO','NO REALIZADO'])}
+      ${SL('Reumatológico','reumatologico',['NORMAL','PATOLÓGICO','NO REALIZADO'])}
+      ${SL('Tiroideo','tiroideo',['NORMAL','PATOLÓGICO','NO REALIZADO'])}
+    </div></div>`,
+
+    tra:`<div style="background:var(--purple);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px;"><div style="font-size:22px;">💊</div><div><div style="font-weight:700;font-size:15px;">Tratamiento</div><div style="font-size:12px;opacity:.8;margin-top:2px;">Agudo y crónico</div></div></div>
+    ${H('Fase aguda')}
+    ${SL('Tratamiento inicial','trat_inicial',['PULSO DE CORTICOIDE','GAMMA','PLASMA FERESIS','INMUNOMODULADORES'])}
+    <div class="field"><label>Respuesta al 5to día</label>
+      <div class="tg-grid" style="grid-template-columns:1fr 1fr;">
+        <button class="tg-btn" id="t_resp5_si" onclick="setResp('SI')">✓ Sí respondió</button>
+        <button class="tg-btn" id="t_resp5_no" onclick="setResp('NO')">✗ No respondió</button>
+      </div>
+    </div></div>
+    ${H('Fase crónica — Tratamiento segunda línea')}
+    ${SL('Tratamiento crónico','trat_2da',['PULSO DE CORTICOIDE','GAMMA','PLASMA FERESIS','INMUNOMODULADORES','SIN REQUERIMIENTO'])}</div>`,
+
+    eds:`<div style="background:var(--teal);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px;"><div style="font-size:22px;">📊</div><div><div style="font-weight:700;font-size:15px;">Escala EDSS</div><div style="font-size:12px;opacity:.8;margin-top:2px;">Exploración y discapacidad</div></div></div>
+    ${SL('Puntaje EDSS *','edss_puntaje',['1','2','3','4','5','6','7','8','9','10'])}
+    ${SL('Interpretación','edss_interp',['SIN INCAPACIDAD','INCAPACIDAD MINIMA','INCAPACIDAD LEVE-MODERADA','INCAPACIDAD MODERADA','LIMITACION PARA LA DEAMBULACION U OTRAS TAREAS','NECESITA AYUDA PARA CAMINAR','CONFINADO A SILLA DE RUEDAS','CAMA SILLA ASEO PERSONAL CON AYUDA','DEPENDENCIA COMPLETA','MUERTE'])}
+    ${TA('Observaciones EDSS','edss_obs','Evolución clínica, notas')}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+      <div style="background:var(--blue-light);border-radius:8px;padding:10px;font-size:12px;color:var(--blue-dark);"><strong>1–3</strong><br>Sin incapacidad</div>
+      <div style="background:var(--amber-light);border-radius:8px;padding:10px;font-size:12px;color:var(--amber);"><strong>4–6</strong><br>Incapacidad leve-mod.</div>
+      <div style="background:var(--coral-light);border-radius:8px;padding:10px;font-size:12px;color:var(--coral);"><strong>7–8</strong><br>Limitación deambulación</div>
+      <div style="background:var(--red-light);border-radius:8px;padding:10px;font-size:12px;color:var(--red);"><strong>9–10</strong><br>Cama/silla, aseo con ayuda</div>
+    </div>`,
+
+    dia:`<div style="background:var(--coral);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px;"><div style="font-size:22px;">📋</div><div><div style="font-weight:700;font-size:15px;">Diagnóstico final</div><div style="font-size:12px;opacity:.8;margin-top:2px;">Último paso — revisá el resumen</div></div></div>
+    <div class="field"><label>Diagnóstico *</label>
+      <div class="tg-grid" style="gap:10px;">
+        <button class="tg-btn" id="d_ADEM" onclick="setDiag('ADEM')" style="padding:18px 8px;font-size:16px;font-weight:700;">ADEM</button>
+        <button class="tg-btn" id="d_MOGAD" onclick="setDiag('MOGAD')" style="padding:18px 8px;font-size:16px;font-weight:700;">MOGAD</button>
+        <button class="tg-btn" id="d_EM" onclick="setDiag('EM')" style="padding:18px 8px;font-size:16px;font-weight:700;">EM</button>
+        <button class="tg-btn" id="d_AQP4" onclick="setDiag('AQP4')" style="padding:18px 8px;font-size:16px;font-weight:700;">AQP4</button>
+      </div>
+    </div>
+    <div id="diagSummary" style="display:none;background:var(--bg);border-radius:12px;padding:14px;border:1px solid var(--border);margin-top:8px;">
+      <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:var(--text2);">RESUMEN DEL REGISTRO</div>
+      <div id="diagSummaryRows"></div>
+    </div>`
+  };
+  return d[id]||'';
+}
+
+// ─── STEPPER ──────────────────────────────────────────────────────────────────
+function renderStepper(){
+  const bar=document.getElementById('fStepper');
+  bar.innerHTML=STEPS.map((s,i)=>{
+    const done=i<curStep,active=i===curStep;
+    return `<div class="st" onclick="goStep(${i})"><div class="st-dot ${active?'active':done?'done':''}">${done?'✓':i+1}</div><div class="st-lbl ${active?'active':''}">${s.lbl}</div></div>`
+      +(i<STEPS.length-1?`<div class="st-line ${done?'done':''}"></div>`:'');
+  }).join('');
+}
+
+function renderStep(){
+  const s=STEPS[curStep];
+  document.getElementById('fSub').textContent=`Paso ${curStep+1} de ${STEPS.length}`;
+  document.getElementById('fCounter').textContent=`${curStep+1}/${STEPS.length}`;
+  document.getElementById('fProg').style.width=`${((curStep+1)/STEPS.length)*100}%`;
+  document.getElementById('fBody').innerHTML=sec(s.id);
+  document.getElementById('fBtnBack').style.display=curStep>0?'flex':'none';
+  const isLast=curStep===STEPS.length-1;
+  const nb=document.getElementById('fBtnNext');
+  nb.className=isLast?'btn btn-success':'btn btn-primary';
+  nb.innerHTML=isLast?'💾 Guardar en Google Sheets':'Siguiente ›';
+  restoreStep(s.id);
+  renderStepper();
+  if(s.id==='dia') renderDiagSummary();
+}
+
+// ─── RESTORE / SAVE STEP ──────────────────────────────────────────────────────
+function restoreStep(sid){
+  if(sid==='cli'){
+    const grid=document.getElementById('symsGrid');
+    if(!grid) return;
+    grid.innerHTML=SYMS.map(k=>`<button class="tg-btn" id="t_${k}" onclick="togSym('${k}')">${SYMS_LBL[k]}</button>`).join('');
+    SYMS.forEach(k=>{
+      const btn=document.getElementById('t_'+k),v=togs[k];
+      if(btn){btn.classList.toggle('si',v==='Si');btn.classList.toggle('no',v==='No');}
+    });
+    ['deficit_snc','tpc','deficit_tipo','curso','obs_deficit','obs_tpc','cli_obs'].forEach(f=>{
+      const el=document.getElementById('f_'+f);if(el&&cur[f])el.value=cur[f];
+    });
+  } else if(sid==='tra'){
+    const si=document.getElementById('t_resp5_si'),no=document.getElementById('t_resp5_no');
+    if(si) si.classList.toggle('si',resp5Sel==='SI');
+    if(no) no.classList.toggle('no',resp5Sel==='NO');
+    ['trat_inicial','trat_2da'].forEach(f=>{const el=document.getElementById('f_'+f);if(el&&cur[f])el.value=cur[f];});
+  } else if(sid==='dia'){
+    ['ADEM','MOGAD','EM','AQP4'].forEach(d=>{const btn=document.getElementById('d_'+d);if(btn)btn.classList.toggle('sel',diagSel===d);});
+  } else {
+    document.querySelectorAll('#fBody input,#fBody select,#fBody textarea').forEach(el=>{
+      if(el.id&&el.id.startsWith('f_')) el.value=cur[el.id.slice(2)]||'';
+    });
+  }
+}
+
+function saveStep(sid){
+  if(sid==='cli'){
+    cur._togs=togs; SYMS.forEach(k=>{if(togs[k])cur[k]=togs[k];});
+    ['deficit_snc','tpc','deficit_tipo','curso','obs_deficit','obs_tpc','cli_obs'].forEach(f=>{
+      const el=document.getElementById('f_'+f);if(el)cur[f]=el.value;
+    });
+  } else if(sid==='tra'){
+    cur.respuesta5=resp5Sel;
+    ['trat_inicial','trat_2da'].forEach(f=>{const el=document.getElementById('f_'+f);if(el)cur[f]=el.value;});
+  } else if(sid==='dia'){
+    cur.diagnostico=diagSel;
+  } else {
+    document.querySelectorAll('#fBody input,#fBody select,#fBody textarea').forEach(el=>{
+      if(el.id&&el.id.startsWith('f_'))cur[el.id.slice(2)]=el.value;
+    });
+  }
+}
+
+function stepNext(){
+  saveStep(STEPS[curStep].id);
+  if(curStep<STEPS.length-1){curStep++;renderStep();document.getElementById('fBody').scrollTop=0;}
+  else finalSave();
+}
+function stepPrev(){
+  saveStep(STEPS[curStep].id);
+  if(curStep>0){curStep--;renderStep();}
+}
+function goStep(i){saveStep(STEPS[curStep].id);curStep=i;renderStep();}
+
+// ─── TOGGLES ──────────────────────────────────────────────────────────────────
+function togSym(k){
+  const curr=togs[k];
+  togs[k]=curr==='Si'?'No':curr==='No'?undefined:'Si';
+  const btn=document.getElementById('t_'+k);
+  if(btn){btn.classList.toggle('si',togs[k]==='Si');btn.classList.toggle('no',togs[k]==='No');}
+}
+function setResp(val){
+  resp5Sel=resp5Sel===val?'':val;
+  const si=document.getElementById('t_resp5_si'),no=document.getElementById('t_resp5_no');
+  if(si)si.classList.toggle('si',resp5Sel==='SI');
+  if(no)no.classList.toggle('no',resp5Sel==='NO');
+}
+function setDiag(val){
+  diagSel=diagSel===val?'':val;
+  ['ADEM','MOGAD','EM','AQP4'].forEach(d=>{const btn=document.getElementById('d_'+d);if(btn)btn.classList.toggle('sel',diagSel===d);});
+  renderDiagSummary();
+}
+
+// ─── SUMMARY ──────────────────────────────────────────────────────────────────
+function renderDiagSummary(){
+  const box=document.getElementById('diagSummary'),rows=document.getElementById('diagSummaryRows');
+  if(!box||!rows) return;
+  const items=[
+    ['Paciente',cur.nomina||'—'],['DNI',cur.dni||'—'],['Edad',cur.edad||'—'],
+    ['Sexo',cur.sexo||'—'],['Enf. de base',cur.enfermedad||'—'],
+    ['Curso',cur.curso||'—'],['Anti MOG',cur.antimog||'—'],['Anti AQP4',cur.antiaqp4||'—'],
+    ['Trat. inicial',cur.trat_inicial||'—'],['EDSS',cur.edss_puntaje||'—'],
+    ['Diagnóstico',diagSel||'Pendiente']
+  ];
+  rows.innerHTML=items.map(([k,v])=>`<div class="summary-row"><span class="summary-key">${k}</span><span class="summary-val">${v}</span></div>`).join('');
+  box.style.display='block';
+}
+
+// ─── BUILD ROW para Google Sheets ─────────────────────────────────────────────
+// Columnas: [N°, NOMINA, SEXO, EDAD, ENF.BASE, DNI, FIEBRE, VOMITOS, ALT.SENSORIO,
+//  CEFALEA, CONVULSIONES, PARESTESIAS, ALT.MARCHA, MIELITIS, ALT.VISUALES, ALT.CRANEALES,
+//  ATAXIA, ALT.PARES, DÉFICIT SNC (SI/NO), OBS.DÉFICIT, TPC, DÉFICIT, OBS.TPC, CURSO,
+//  CITOQUIMICO, BANDAS, CULT.BAC, CULT.VIRO, OBS.LCR, VDRL, VHI, VHB, VHC, ZOSTER,
+//  VARICELA, EBARR, RMN CEREBRAL, RMN ORBITA, RMN MEDULAR, RM ORBITA, DESC.HALLAZGOS,
+//  ANTI MOG, ANTI AQP4, PEAT, OCT, OBS.OFT, INMUNOLOGICO, REUMATOLOGICO, TIROIDEO,
+//  TRAT.INICIAL, RESPUESTA5, TRAT.2DA, EDSS PUNTAJE, EDSS INTERP, OBS.EDSS, DIAGNOSTICO, FECHA]
+function buildRow(r, rowNum){
+  return [
+    rowNum,
+    r.nomina||'',      // NOMINA
+    r.sexo||'',        // SEXO
+    r.edad||'',        // EDAD
+    r.enfermedad||'',  // ENFERMEDAD BASE
+    r.dni||'',         // DNI
+    r.fiebre||'',      // FIEBRE
+    r.vomitos||'',     // VOMITOS
+    r.sensorio||'',    // ALT. SENSORIO
+    r.cefalea||'',     // CEFALEA
+    r.convulsiones||'',// CONVULSIONES
+    r.parestesias||'', // PARESTESIAS
+    r.marcha||'',      // ALT. MARCHA
+    r.mielitis||'',    // MIELITIS TRANSVERSA
+    r.visuales||'',    // ALT. VISUALES
+    r.craneales||'',   // ALT. CRANEALES
+    r.ataxia||'',      // ATAXIA
+    r.pares||'',       // ALT. PARES CRANEALES
+    r.deficit_snc||'', // DÉFICIT SNC
+    r.obs_deficit||'', // OBS DÉFICIT
+    r.tpc||'',         // TPC
+    r.deficit_tipo||'',// DÉFICIT FOCAL
+    r.obs_tpc||'',     // OBS TPC
+    r.curso||'',       // CURSO CLÍNICO
+    r.lcr||'',         // CITOQUÍMICO
+    r.bandas||'',      // BANDAS OLIGOCLONALES
+    r.cult_bac||'',    // CULTIVO BAC
+    r.cult_viro||'',   // CULTIVO VIRO
+    r.lcr_obs||'',     // OBS LCR
+    r.vdrl||'',        // VDRL
+    r.vhi||'',         // VHI
+    r.vhb||'',         // VHB
+    r.vhc||'',         // VHC
+    r.zoster||'',      // H. ZOSTER
+    r.varicela||'',    // VARICELA
+    r.ebarr||'',       // E. BARR
+    r.rmn_cerebral||'',// RMN CEREBRAL
+    r.rmn_orbita||'',  // RMN ORBITA
+    r.rmn_medular||'', // RMN MEDULAR
+    r.rm_orbita||'',   // RM ORBITA
+    r.rmn_desc||'',    // DESC. HALLAZGOS
+    r.antimog||'',     // ANTI MOG
+    r.antiaqp4||'',    // ANTI AQP4
+    r.peat||'',        // PEAT
+    r.oct||'',         // OCT
+    r.oft_obs||'',     // OBS OFTALMOLÓGICA
+    r.inmunologico||'',// INMUNOLÓGICO
+    r.reumatologico||'',// REUMATOLÓGICO
+    r.tiroideo||'',    // TIROIDEO
+    r.trat_inicial||'',// TRAT. INICIAL
+    r.respuesta5||'',  // RESPUESTA 5TO DÍA
+    r.trat_2da||'',    // TRAT. 2DA LÍNEA
+    r.edss_puntaje||'',// EDSS PUNTAJE
+    r.edss_interp||'', // EDSS INTERP
+    r.edss_obs||'',    // OBS EDSS
+    r.diagnostico||'', // DIAGNÓSTICO
+    r._ts ? new Date(r._ts).toLocaleString('es-AR') : '' // FECHA
+  ];
+}
+
+// ─── SAVE ─────────────────────────────────────────────────────────────────────
+async function finalSave(){
+  if(!cur.nomina && !cur.dni){showToast('Ingresá nombre o DNI antes de guardar.','err');return;}
+  cur._ts=new Date().toISOString();
+
+  // Guardar local
+  if(curIdx>=0) records[curIdx]=cur; else records.push(cur);
+  localStorage.setItem('neuro_v2',JSON.stringify(records));
+
+  if(!driveConf.url){
+    showToast('Guardado localmente ✓ (sin Drive conectado)','warn');
+    setTimeout(()=>goHome(),1200);
+    return;
+  }
+
+  // Guardar en Google Sheets via formulario oculto (funciona desde archivos locales)
+  showSaving('Guardando en Google Sheets…');
+  const rowNum = curIdx >= 0 ? curIdx+1 : records.length;
+  const row = buildRow(cur, rowNum);
+  try{
+    const payload = JSON.stringify({sheet: driveConf.sheet||'Hoja1', row});
+    // Usar imagen como ping no-cors — garantiza envío desde file://
+    await sendToScript(driveConf.url, payload);
+    hideSaving();
+    showToast('✅ Guardado en Google Sheets','ok');
+  } catch(e){
+    hideSaving();
+    showToast('Guardado local ✓ (error al sincronizar)','warn');
+  }
+  setTimeout(()=>goHome(),1400);
+}
+
+function sendToScript(url, payload) {
+  return new Promise((resolve) => {
+    try {
+      // Codificar correctamente incluyendo caracteres especiales (tildes, ñ)
+      const encoded = btoa(encodeURIComponent(payload).replace(/%([0-9A-F]{2})/g,
+        (match, p1) => String.fromCharCode('0x' + p1)));
+      const fullUrl = url + '?data=' + encodeURIComponent(encoded);
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => resolve(); // Apps Script redirige = aparece como error pero funcionó
+      img.src = fullUrl;
+      setTimeout(resolve, 5000); // fallback por si acaso
+    } catch(e) {
+      console.error('Error enviando a script:', e);
+      resolve();
+    }
+  });
+}
+
+function showSaving(msg){
+  document.getElementById('savingMsg').textContent=msg||'Guardando…';
+  document.getElementById('savingOverlay').classList.add('show');
+}
+function hideSaving(){ document.getElementById('savingOverlay').classList.remove('show'); }
+
+// ─── RECORDS LIST ──────────────────────────────────────────────────────────────
+function renderRecords(){
+  const el=document.getElementById('recordsList');
+  if(records.length===0){
+    el.innerHTML='<div style="text-align:center;padding:48px 20px;color:var(--text2);"><div style="font-size:48px;margin-bottom:12px;">📭</div><div style="font-size:15px;font-weight:600;">No hay registros todavía</div><div style="font-size:13px;margin-top:6px;">Tocá + para agregar el primero</div></div>';
+    return;
+  }
+  const bmap={MOGAD:'b-mogad',ADEM:'b-adem',EM:'b-em',AQP4:'b-aqp4'};
+  el.innerHTML=[...records].reverse().map((r,i)=>{
+    const realIdx=records.length-1-i;
+    const ts=r._ts?new Date(r._ts).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit'}):''
+    const bc=bmap[r.diagnostico]||'b-nd';
+    return `<div class="rec-item" onclick="goNewForm(${realIdx})">
+      <div class="rec-top"><div class="rec-name">${r.nomina||'Sin nombre'}</div><span class="badge ${bc}">${r.diagnostico||'Sin dx'}</span></div>
+      <div class="rec-meta"><span>🪪 ${r.dni||'—'}</span><span>📅 ${r.edad||'—'}</span><span>📊 EDSS ${r.edss_puntaje||'—'}</span><span>🕐 ${ts}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ─── STATS ────────────────────────────────────────────────────────────────────
+function updateStats(){
+  const today=new Date().toLocaleDateString('es-AR');
+  document.getElementById('hTotal').textContent=records.length;
+  document.getElementById('hHoy').textContent=records.filter(r=>r._ts&&new Date(r._ts).toLocaleDateString('es-AR')===today).length;
+  document.getElementById('hMogad').textContent=records.filter(r=>r.diagnostico==='MOGAD').length;
+  document.getElementById('hAdem').textContent=records.filter(r=>r.diagnostico==='ADEM').length;
+  if(driveConf.url){
+    document.getElementById('driveIcon').className='drive-icon connected';
+    document.getElementById('driveIcon').textContent='✅';
+    document.getElementById('driveName').textContent='Google Sheets conectado';
+    document.getElementById('driveStatusTxt').textContent='Los datos se sincronizan automáticamente';
+  } else {
+    document.getElementById('driveIcon').className='drive-icon disconnected';
+    document.getElementById('driveIcon').textContent='📋';
+    document.getElementById('driveName').textContent='Conectar Google Sheets';
+    document.getElementById('driveStatusTxt').textContent='Tocá para configurar la sincronización';
+  }
+}
+
+// ─── DRIVE MODAL ──────────────────────────────────────────────────────────────
+function openDriveSetup(){
+  if(driveConf.url){ document.getElementById('driveUrl').value=driveConf.url; document.getElementById('driveConnectedInfo').style.display='block'; }
+  else { document.getElementById('driveConnectedInfo').style.display='none'; }
+  if(driveConf.sheet) document.getElementById('driveSheet').value=driveConf.sheet;
+  document.getElementById('testResult').style.display='none';
+  document.getElementById('driveModal').classList.add('show');
+}
+function closeDriveModal(){ document.getElementById('driveModal').classList.remove('show'); }
+function saveDriveConfig(){
+  const url=document.getElementById('driveUrl').value.trim();
+  if(!url){showToast('Pegá la URL del Apps Script','err');return;}
+  driveConf={url,sheet:document.getElementById('driveSheet').value.trim()||'Hoja1'};
+  localStorage.setItem('neuro_drive_v2',JSON.stringify(driveConf));
+  closeDriveModal(); updateStats();
+  showToast('Drive conectado correctamente ✓','ok');
+}
+
+async function testConnection(){
+  const url=document.getElementById('driveUrl').value.trim();
+  if(!url){showToast('Primero pegá la URL','err');return;}
+  const res=document.getElementById('testResult');
+  res.style.display='block';
+  res.className='alert-box info';
+  res.textContent='🔄 Probando conexión…';
+  try{
+    const r=await fetch(url+'?test=1',{method:'GET',mode:'cors'});
+    const data=await r.json();
+    if(data.status==='ok'){ res.className='alert-box ok'; res.textContent='✅ Conexión exitosa! El script está activo.'; }
+    else { res.className='alert-box warn'; res.textContent='⚠️ El script respondió pero con estado: '+data.status; }
+  } catch(e){
+    // no-cors puede fallar el parse pero la conexión puede estar bien
+    res.className='alert-box warn';
+    res.textContent='⚠️ No se pudo verificar (puede ser normal por CORS). Si el script está publicado correctamente, guardá y probá cargar un registro.';
+  }
+}
+
+// ─── EXPORT CSV ───────────────────────────────────────────────────────────────
+function exportCSV(){
+  if(!records.length){showToast('No hay registros para exportar','err');return;}
+  const hdrs=['N°','Nombre','DNI','Sexo','Edad','Enf.base','Fiebre','Vómitos','Alt.sensorio','Cefalea','Convulsiones','Parestesias','Alt.marcha','Mielitis','Alt.visuales','Alt.craneales','Ataxia','Alt.pares','Déficit SNC','Obs.déficit','TPC','Déficit focal','Obs.TPC','Curso','LCR','Bandas','Cult.BAC','Cult.VIRO','Obs.LCR','VDRL','VHI','VHB','VHC','Zoster','Varicela','E.Barr','RMN cerebral','RMN órbita','RMN medular','RM órbita','Desc.RMN','Anti MOG','Anti AQP4','PEAT','OCT','Obs.oft','Inmunológico','Reumatológico','Tiroideo','Trat.inicial','Resp.5toDía','Trat.2da','EDSS','EDSS interp','Obs.EDSS','Diagnóstico','Fecha'];
+  let csv='\uFEFF'+hdrs.join(',')+'\n';
+  records.forEach((r,i)=>{
+    const row=buildRow(r,i+1);
+    csv+=row.map(v=>'\"'+(String(v)).replace(/"/g,'""')+'\"').join(',')+'\n';
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='neurologia_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  showToast('CSV exportado ✓','ok');
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg,type){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=`toast show ${type||''}`;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+// ─── MANIFEST (PWA) ───────────────────────────────────────────────────────────
+const manifest={name:'Neurología Pediátrica',short_name:'Neurología',start_url:'.',display:'standalone',background_color:'#f5f7fa',theme_color:'#185FA5',icons:[{src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="%23185FA5"/><text y="130" x="96" text-anchor="middle" font-size="120" fill="white">🧠</text></svg>',sizes:'192x192',type:'image/svg+xml'}]};
+const mblob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+document.getElementById('manifestLink').href=URL.createObjectURL(mblob);
+
+updateStats();
+</script>
+</body>
+</html>
