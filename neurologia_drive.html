@@ -784,20 +784,28 @@ async function finalSave(){
 }
 
 function sendToScript(url, payload) {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     try {
-      // Codificar correctamente incluyendo caracteres especiales (tildes, ñ)
-      const encoded = btoa(encodeURIComponent(payload).replace(/%([0-9A-F]{2})/g,
-        (match, p1) => String.fromCharCode('0x' + p1)));
-      const fullUrl = url + '?data=' + encodeURIComponent(encoded);
-      const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => resolve(); // Apps Script redirige = aparece como error pero funcionó
-      img.src = fullUrl;
-      setTimeout(resolve, 5000); // fallback por si acaso
-    } catch(e) {
-      console.error('Error enviando a script:', e);
+      // Intentar POST primero (funciona desde https://)
+      await fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type': 'text/plain'},
+        body: payload
+      });
       resolve();
+    } catch(e) {
+      // Fallback: GET con datos codificados
+      try {
+        const encoded = btoa(encodeURIComponent(payload).replace(/%([0-9A-F]{2})/g,
+          (m, p1) => String.fromCharCode('0x' + p1)));
+        const img = new Image();
+        img.onload = img.onerror = () => resolve();
+        img.src = url + '?data=' + encodeURIComponent(encoded);
+        setTimeout(resolve, 5000);
+      } catch(e2) {
+        resolve();
+      }
     }
   });
 }
