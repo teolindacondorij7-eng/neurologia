@@ -336,7 +336,7 @@ if (_saved && records.length < PRESET_RECORDS.length) {
   PRESET_RECORDS.forEach(p => { if (!dniSet.has(p.dni)) records.unshift(p); });
   localStorage.setItem('neuro_v2', JSON.stringify(records));
 }
-const FIXED_URL = 'https://script.google.com/macros/s/AKfycbzxWHF9_-e4iixj0LRWpTeP_SVubzUHF-otSMvEwYvl0iJwliw19FaJYcZ6Dx59HdPN1A/exec';
+const FIXED_URL = 'https://script.google.com/macros/s/AKfycbwGsva-X8IdTyLDuvQhCLwAUOU54xLkI6KUhW86lHg1iOxSbKR5HNyAjVfs0y6B44lItA/exec';
 if (!localStorage.getItem('neuro_drive_v2')) {
   localStorage.setItem('neuro_drive_v2', JSON.stringify({url: FIXED_URL, sheet: 'Hoja1'}));
 }
@@ -783,29 +783,21 @@ async function finalSave(){
   setTimeout(()=>goHome(),1400);
 }
 
-function sendToScript(url, payload) {
-  return new Promise((resolve) => {
-    const encoded = btoa(unescape(encodeURIComponent(payload)));
-    const cbName = 'cb_' + Date.now();
-    const fullUrl = url + '?data=' + encoded + '&callback=' + cbName;
-    console.log('Enviando via JSONP:', fullUrl.substring(0, 100));
-    // JSONP: inyectar script tag - evita CORS completamente
-    window[cbName] = function(resp) {
-      console.log('JSONP respuesta:', JSON.stringify(resp));
-      delete window[cbName];
-      document.head.removeChild(script);
-      resolve(resp);
-    };
-    const script = document.createElement('script');
-    script.src = fullUrl;
-    script.onerror = function() {
-      console.log('JSONP script error');
-      delete window[cbName];
-      resolve();
-    };
-    document.head.appendChild(script);
-    setTimeout(() => { resolve(); }, 8000);
-  });
+async function sendToScript(url, payload) {
+  const encoded = btoa(unescape(encodeURIComponent(payload)));
+  const fullUrl = url + '?data=' + encoded;
+  console.log('Enviando a:', fullUrl.substring(0, 100));
+  try {
+    const r = await fetch(fullUrl, {
+      method: 'GET',
+      mode: 'cors',
+      redirect: 'follow'
+    });
+    const text = await r.text();
+    console.log('Respuesta:', text);
+  } catch(e) {
+    console.log('Error fetch (puede ser normal):', e.message);
+  }
 }
 
 function showSaving(msg){
