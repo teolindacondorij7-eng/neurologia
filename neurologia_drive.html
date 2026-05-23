@@ -336,7 +336,7 @@ if (_saved && records.length < PRESET_RECORDS.length) {
   PRESET_RECORDS.forEach(p => { if (!dniSet.has(p.dni)) records.unshift(p); });
   localStorage.setItem('neuro_v2', JSON.stringify(records));
 }
-const FIXED_URL = 'https://script.google.com/macros/s/AKfycbwD-3QVu5aD4rt1ivW0HAjbNZ0SDGnzPBXge-i_tHZWsr6LT24fBNz6yUHr_9xrZqt6Tg/exec';
+const FIXED_URL = 'https://script.google.com/macros/s/AKfycbzxWHF9_-e4iixj0LRWpTeP_SVubzUHF-otSMvEwYvl0iJwliw19FaJYcZ6Dx59HdPN1A/exec';
 if (!localStorage.getItem('neuro_drive_v2')) {
   localStorage.setItem('neuro_drive_v2', JSON.stringify({url: FIXED_URL, sheet: 'Hoja1'}));
 }
@@ -786,20 +786,25 @@ async function finalSave(){
 function sendToScript(url, payload) {
   return new Promise((resolve) => {
     const encoded = btoa(unescape(encodeURIComponent(payload)));
-    const fullUrl = url + '?data=' + encoded;
-    console.log('Enviando via XHR a:', fullUrl.substring(0, 80));
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', fullUrl, true);
-    xhr.onload = function() {
-      console.log('XHR respuesta:', xhr.responseText);
+    const cbName = 'cb_' + Date.now();
+    const fullUrl = url + '?data=' + encoded + '&callback=' + cbName;
+    console.log('Enviando via JSONP:', fullUrl.substring(0, 100));
+    // JSONP: inyectar script tag - evita CORS completamente
+    window[cbName] = function(resp) {
+      console.log('JSONP respuesta:', JSON.stringify(resp));
+      delete window[cbName];
+      document.head.removeChild(script);
+      resolve(resp);
+    };
+    const script = document.createElement('script');
+    script.src = fullUrl;
+    script.onerror = function() {
+      console.log('JSONP script error');
+      delete window[cbName];
       resolve();
     };
-    xhr.onerror = function() {
-      console.log('XHR error - puede ser CORS pero datos enviados');
-      resolve();
-    };
-    xhr.send();
-    setTimeout(resolve, 6000);
+    document.head.appendChild(script);
+    setTimeout(() => { resolve(); }, 8000);
   });
 }
 
