@@ -784,21 +784,12 @@ async function finalSave(){
 }
 
 function sendToScript(url, payload) {
-  return new Promise((resolve) => {
-    try {
-      // Usar GET con base64 - mismo método que funciona en prueba directa
-      const encoded = btoa(unescape(encodeURIComponent(payload)));
-      const fullUrl = url + '?data=' + encoded;
-      const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => resolve();
-      img.src = fullUrl;
-      setTimeout(resolve, 5000);
-    } catch(e) {
-      console.error('Error:', e);
-      resolve();
-    }
-  });
+  // Usar fetch con no-cors desde https:// - funciona correctamente
+  return fetch(url, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: payload
+  }).catch(e => console.error('Error fetch:', e));
 }
 
 function showSaving(msg){
