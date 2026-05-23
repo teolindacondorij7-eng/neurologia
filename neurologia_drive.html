@@ -336,7 +336,7 @@ if (_saved && records.length < PRESET_RECORDS.length) {
   PRESET_RECORDS.forEach(p => { if (!dniSet.has(p.dni)) records.unshift(p); });
   localStorage.setItem('neuro_v2', JSON.stringify(records));
 }
-const FIXED_URL = 'https://script.google.com/macros/s/AKfycbwyKyuOeQRxicgOZVUGRWL5iAXhoer1F9io10vs83vsZWk7P8_KTv-5AVJ1RhJsSNGPpg/exec';
+const FIXED_URL = 'https://script.google.com/macros/s/AKfycbwD-3QVu5aD4rt1ivW0HAjbNZ0SDGnzPBXge-i_tHZWsr6LT24fBNz6yUHr_9xrZqt6Tg/exec';
 if (!localStorage.getItem('neuro_drive_v2')) {
   localStorage.setItem('neuro_drive_v2', JSON.stringify({url: FIXED_URL, sheet: 'Hoja1'}));
 }
@@ -784,12 +784,12 @@ async function finalSave(){
 }
 
 function sendToScript(url, payload) {
-  // Usar fetch con no-cors desde https:// - funciona correctamente
-  return fetch(url, {
-    method: 'POST',
-    mode: 'no-cors',
-    body: payload
-  }).catch(e => console.error('Error fetch:', e));
+  // Enviar via GET con datos en URL - método más confiable con Apps Script
+  const encoded = btoa(unescape(encodeURIComponent(payload)));
+  return fetch(url + '?data=' + encoded, {
+    method: 'GET',
+    mode: 'no-cors'
+  }).catch(e => console.error('Error:', e));
 }
 
 function showSaving(msg){
