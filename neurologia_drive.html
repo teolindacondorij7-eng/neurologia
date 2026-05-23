@@ -784,28 +784,19 @@ async function finalSave(){
 }
 
 function sendToScript(url, payload) {
-  return new Promise(async (resolve) => {
+  return new Promise((resolve) => {
     try {
-      // Intentar POST primero (funciona desde https://)
-      await fetch(url, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {'Content-Type': 'text/plain'},
-        body: payload
-      });
-      resolve();
+      // Usar GET con base64 - mismo método que funciona en prueba directa
+      const encoded = btoa(unescape(encodeURIComponent(payload)));
+      const fullUrl = url + '?data=' + encoded;
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => resolve();
+      img.src = fullUrl;
+      setTimeout(resolve, 5000);
     } catch(e) {
-      // Fallback: GET con datos codificados
-      try {
-        const encoded = btoa(encodeURIComponent(payload).replace(/%([0-9A-F]{2})/g,
-          (m, p1) => String.fromCharCode('0x' + p1)));
-        const img = new Image();
-        img.onload = img.onerror = () => resolve();
-        img.src = url + '?data=' + encodeURIComponent(encoded);
-        setTimeout(resolve, 5000);
-      } catch(e2) {
-        resolve();
-      }
+      console.error('Error:', e);
+      resolve();
     }
   });
 }
