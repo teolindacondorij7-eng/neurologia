@@ -336,7 +336,7 @@ if (_saved && records.length < PRESET_RECORDS.length) {
   PRESET_RECORDS.forEach(p => { if (!dniSet.has(p.dni)) records.unshift(p); });
   localStorage.setItem('neuro_v2', JSON.stringify(records));
 }
-const FIXED_URL = 'https://script.google.com/macros/s/AKfycbywMMNCwKRNQ26oibaq9JIQbLF_emnyapL3vKjZx7B1-dVCqKxAh6VwyREUXSyaRKeX7w/exec';
+const FIXED_URL = 'https://script.google.com/macros/s/AKfycbwyKyuOeQRxicgOZVUGRWL5iAXhoer1F9io10vs83vsZWk7P8_KTv-5AVJ1RhJsSNGPpg/exec';
 if (!localStorage.getItem('neuro_drive_v2')) {
   localStorage.setItem('neuro_drive_v2', JSON.stringify({url: FIXED_URL, sheet: 'Hoja1'}));
 }
